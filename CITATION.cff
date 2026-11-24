@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below, and credit the data providers listed in README.md."
+title: "HR Diagrams (Diagrammi H-R): hertzsprung–Russell diagrams of star clusters from Gaia DR3, with age, distance and metallicity from MIST isochrones"
+authors:
+  - family-names: Battistel
+    given-names: Edoardo
+version: "1.4"
+date-released: 2026-11-15
+license: BSD-3-Clause
+repository-code: "https://github.com/EDOKILLER/hr-diagrams"
+keywords:
+  - HR diagram
+  - star clusters
+  - Gaia DR3
+  - isochrones
+  - MIST

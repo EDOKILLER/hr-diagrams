@@ -1,0 +1,114 @@
+DIAGRAMMI H-R 1.4 – VERSIONE PER IL NAS
+=======================================
+© 2026 Edoardo Battistel
+
+Cosa fa
+-------
+Gira una volta sola nell'app Docker del NAS, a priorità minima, e analizza da solo TUTTI gli
+ammassi: i 22 famosi del programma per il PC più tutti gli ammassi aperti, globulari e con
+nebulosa del catalogo dell'Atlante Celeste (OpenNGC): 939 in tutto.
+Per ognuno: stelle Gaia DR3, membri, adattamento delle isocrone MIST, confronto con
+Cantat-Gaudin 2020 e Hunt & Reffert 2023, scheda PDF (2 pagine, come «Salva PDF» sul PC).
+
+Schede e riepilogo sono IN INGLESE.
+
+Novità della 1.4 (rispetto alla 1.3 del 10/11):
+  - se Gaia non risponde aspetta e riprova lo stesso ammasso (5, 10, 20, 30, 30, 30 minuti:
+    circa 2 ore); alla fine riprova ancora una volta gli ammassi persi per la rete
+    (nella 1.3 un'interruzione della rete del NAS ha fatto perdere 262 ammassi);
+  - globulari: esclusi i membri con colori contaminati dall'affollamento; età massima 14 Gyr;
+  - «Notes» nel riepilogo e «To be checked» nelle schede quando un valore è al bordo;
+  - all'inizio di un lavoro nuovo cancella da sola le schede vecchie (anche quelle della 1.3).
+
+Alla fine:
+  - scrive  schede/00_summary.pdf  (copertina con l'istogramma delle età e i conteggi, tabella
+    con età, distanza, A_V, letteratura e Notes di tutti gli ammassi, elenco dei non analizzati
+    con il motivo);
+  - CANCELLA tutto il resto: dati Gaia, isocrone, letteratura, registro, librerie Python;
+  - TERMINA: il container si ferma e non riparte (restart: "no").
+Nella cartella del NAS restano solo  schede/  e  programma/.
+
+Se il NAS o il container si riavviano a metà, riavviando il container riprende da dove era
+(lo stato è in _lavoro/stato.json, cancellato solo alla fine).
+Non analizzati (normale): ammassi con troppo poche stelle Gaia o meno di 30 membri, e quelli
+troppo lontani perché Gaia ne misuri la parallasse (per esempio gli ammassi delle Nubi di
+Magellano che sono nel catalogo).
+
+Tempo e spazio
+--------------
+Circa 20-60 secondi per ammasso: in tutto 10-20 ore. Le schede occupano circa 0,4 MB l'una
+(circa 400 MB in tutto). Durante il lavoro servono in più circa 1 GB (librerie e isocrone),
+cancellato alla fine.
+
+Contenuto
+---------
+    nas/   servizio_hr.py  motore_hr.py  openngc_compatto.csv  OpenNGC_licenza_CC-BY-SA-4.0.txt
+           avvia.sh  requisiti.txt  docker-compose.yml
+
+
+PER CHI HA GIÀ LA 1.3 SUL NAS (il caso di Edoardo)
+--------------------------------------------------
+  1. Sul NAS, in Diagrammi_HR/programma, sostituisci TUTTI i file con quelli di questa cartella nas/.
+  2. Nell'app Docker: Progetto diagrammi-hr -> modifica: sostituisci il contenuto con il nuovo
+     docker-compose.yml (cambiano solo i commenti, ma così è aggiornato) -> Distribuisci.
+     Oppure semplicemente Container -> diagrammi-hr -> Avvia.
+  3. Il programma vede che non c'è 00_summary.pdf: cancella le schede vecchie (in italiano),
+     reinstalla le librerie e rifà tutto. Le schede della 1.3 restano nello zip sul PC.
+
+
+0. (FACOLTATIVO) PROVA SUL PC
+-----------------------------
+    cd ~/Claude/Astropy/programma_diagrammi_hr/versione_1.4/nas
+    python3 servizio_hr.py ~/Scrivania/Astronomia/HR_prova_nas --solo 4
+Analizza i primi 4 ammassi (Pleiadi, Iadi, Presepe, α Persei), scrive le schede e il riepilogo
+in ~/Scrivania/Astronomia/HR_prova_nas/schede, cancella il resto ed esce. Poi la cartella si può
+cancellare. (Sul PC le isocrone vengono scaricate di nuovo dentro quella cartella: 160 MB.)
+
+
+1. COPIA I FILE SUL NAS
+-----------------------
+Nella stessa cartella condivisa dove ci sono Sole ed Exoplanet_Searcher crea la cartella
+    Diagrammi_HR
+e dentro la sottocartella  programma  con TUTTI i file della cartella nas:
+    Diagrammi_HR/
+        programma/
+            servizio_hr.py  motore_hr.py  openngc_compatto.csv  OpenNGC_licenza_CC-BY-SA-4.0.txt
+            avvia.sh  requisiti.txt  docker-compose.yml
+
+
+2. CREA IL PROGETTO NELL'APP DOCKER
+-----------------------------------
+  1. App Docker di UGOS -> Progetto -> Crea.
+  2. Nome del progetto: diagrammi-hr
+  3. Incolla tutto il contenuto di docker-compose.yml.
+  4. Controlla la riga  "/volume1/Ugreen NAS/Diagrammi_HR:/dati"  (come per Il Sole).
+  5. Distribuisci (Deploy).
+L'immagine python:3.12 è già sul NAS.
+
+
+3. CONTROLLA CHE LAVORI
+-----------------------
+App Docker -> Container -> diagrammi-hr -> Registro (Log):
+  - «Installo le librerie (2-5 minuti…)»;
+  - «Isocrone MIST: scarico 160 MB…», poi «[Fe/H] = …» (qualche minuto);
+  - «Ammassi: 939 in tutto, 0 già fatti, 939 da fare»;
+  - una riga per ammasso:  «[12/939] NGC 2516: 812 membri, log età 8.15, 410 pc, A_V 0.35 (31 s)»
+    (i messaggi del registro restano in italiano; le schede sono in inglese)
+    oppure  «non analizzato – motivo».
+Le schede compaiono in Diagrammi_HR/schede man mano.
+Alla fine: «FINITO: … schede», «Pulizia…», «Fine. Il container si ferma.» e il container
+risulta fermo (è normale: ha finito).
+
+
+4. RIFARLO UN GIORNO
+--------------------
+Cancella  schede/00_summary.pdf  (o tutta la cartella schede) e avvia di nuovo il container
+dall'app Docker: reinstalla le librerie e rifà tutto.
+Per fermarlo a metà: Container -> diagrammi-hr -> Ferma. Avviandolo di nuovo riprende.
+
+
+Note
+----
+- Estinzione: con le isocrone MIST esce di solito 0,1-0,2 più alta dei cataloghi (vedi la Guida:
+  https://claude.ai/artifact/NjaYbQ7neeRGSBEYDgfXdt).
+- Dati OpenNGC di Mattia Verga, licenza CC-BY-SA-4.0 (file allegato).

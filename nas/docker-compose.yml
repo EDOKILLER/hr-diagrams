@@ -1,0 +1,31 @@
+# Diagrammi H-R 1.4 - analisi di tutti gli ammassi sul NAS UGREEN (app Docker -> Progetto -> Crea)
+# © 2026 Edoardo Battistel
+#
+# Lavora una volta sola (molte ore: circa 950 ammassi) e poi SI FERMA: restart "no".
+# Alla fine nella cartella restano solo  schede/  (un PDF per ammasso + 00_summary.pdf)
+# e  programma/  (i file del programma, per rifarlo un giorno).
+#
+# DA CONTROLLARE: il percorso a sinistra dei ":" in "volumes" deve essere la cartella
+# Diagrammi_HR vista dal NAS (scritto come per Il Sole: /volume1/Ugreen NAS/Diagrammi_HR).
+# Nessuna porta: non c'è una pagina web.
+services:
+  diagrammi-hr:
+    image: python:3.12
+    container_name: diagrammi-hr
+    restart: "no"
+    command: ["bash", "/dati/programma/avvia.sh"]
+    volumes:
+      - "/volume1/Ugreen NAS/Diagrammi_HR:/dati"
+    environment:
+      - TZ=Europe/Rome
+    # --- a bassa priorità: il NAS resta libero per tutto il resto ---
+    cpus: 2.0
+    cpu_shares: 2
+    mem_limit: 2g
+    blkio_config:
+      weight: 10
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "2"

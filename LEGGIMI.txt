@@ -1,0 +1,96 @@
+DIAGRAMMI H-R – versione 1.4 (15 novembre 2026)
+© 2026 Edoardo Battistel
+=====================================================================
+
+Novità della 1.4
+----------------
+- I RISULTATI SONO SEMPRE IN INGLESE: scheda PDF, diagramma PNG, nomi dei file
+  (<ammasso>_sheet.pdf, _hr.png, _members.csv, _results.json). La finestra resta in italiano
+  o inglese a scelta (tendina «Lingua»).
+- Globulari: nei campi affollati i colori BP−RP di Gaia sono contaminati dalle stelle vicine.
+  Ora quei membri vengono esclusi dall'adattamento (eccesso di flusso C*, Riello et al. 2021) e
+  disegnati a parte (cerchietti vuoti «colori incerti»). Prima M 13, M 92, ω Cen uscivano tutti
+  a 15,8 miliardi di anni.
+- L'età cercata arriva al massimo a 14 miliardi di anni (log 10,15).
+- «Da verificare» (in arancione nella scheda) quando età, estinzione o distanza finiscono al
+  bordo dell'intervallo cercato.
+- Le note in fondo al pannello della scheda non si sovrappongono più.
+- Versione NAS (cartella nas/, vedi nas/LEGGIMI_NAS.txt): schede in inglese, riprova quando
+  Gaia non risponde, riepilogo 00_summary.pdf con la colonna «Notes».
+
+Novità della 1.2
+----------------
+- l'eseguibile della 1.1 non si apriva (mancava PIL._tkinter_finder, che serve alle icone della barra
+  sotto i grafici): lo script di compilazione ora lo include.
+- l'autotest apre per un istante una finestra vera con grafico e barra, così questo tipo di errore
+  ferma la compilazione invece di arrivare all'icona.
+- lettura più robusta dei valori di Hunt & Reffert 2023 (età, A_V, modulo di distanza).
+
+Novità della 1.1
+----------------
+- tendina «Dimensione testo» (100-200 %, normalmente 150 %) in alto a destra: ingrandisce i testi
+  della finestra e dei grafici (PDF e PNG restano uguali). La scelta viene ricordata.
+- pulsante blu «Ripristina i valori trovati» sotto i cursori (era «Torna all'adattamento»).
+- pulsante «Guida: come leggere i risultati»: apre il documento con la spiegazione dei grafici.
+- icona nella barra: compare dopo la compilazione (crea_eseguibile_ubuntu.sh installa il collegamento).
+  Lanciando lo script con python3 la barra mostra un ingranaggio: è normale.
+
+Cosa fa
+-------
+Per un ammasso stellare (22 famosi già pronti, oppure uno qualunque date le coordinate):
+ 1. scarica le stelle di Gaia DR3 nel campo (IRSA; se non risponde, l'archivio ESA).
+    La prima volta le scarica, poi usa la copia in ~/.diagrammi_hr/gaia/.
+ 2. separa i membri dalle stelle di campo con moti propri, parallasse e posizione:
+    HDBSCAN (scikit-learn) per trovare il gruppo, poi un modello a miscela che dà a ogni
+    stella la probabilità di appartenere all'ammasso (0-1).
+ 3. confronta il diagramma colore-magnitudine (G contro BP−RP) con le isocrone MIST v1.2
+    e trova età, distanza ed estinzione migliori, con le incertezze.
+ 4. legge i valori di letteratura (Cantat-Gaudin 2020, Hunt & Reffert 2023) dallo
+    specchio VizieR di Harvard (quello di Strasburgo dalla tua rete non risponde).
+ 5. salva in ~/Scrivania/Astronomia/Diagrammi_HR/<ammasso>/:
+    scheda PDF (2 pagine), diagramma PNG, CSV dei membri, riassunto JSON.
+
+La prima volta chiede di scaricare le isocrone MIST (160 MB da Harvard): le prepara una
+volta sola (qualche minuto) e le tiene in ~/.diagrammi_hr/mist/.
+
+Nella finestra
+--------------
+- in alto: scegli l'ammasso (o «Altro» con AR, Dec, raggio in gradi), la lingua
+  (Italiano / English), poi «Scarica e analizza».
+- scheda «Diagramma H-R»: membri colorati per probabilità, stelle di campo in grigio,
+  isocrona azzurra. Clic su una stella: i suoi dati Gaia compaiono a destra.
+  Con la barra sotto il grafico si ingrandisce e si sposta.
+- scheda «Membri»: moti propri, parallassi, posizione in cielo, parallasse e G.
+- scheda «Risultati»: valori trovati e confronto con la letteratura.
+- a destra: cursori per età, modulo di distanza ed estinzione, [Fe/H]; l'isocrona si
+  sposta subito. «Riadatta» rifà l'adattamento (anche con un altro [Fe/H]);
+  «Ripristina i valori trovati» rimette i valori del programma. La soglia di probabilità decide
+  quali stelle sono «membri».
+- in alto a destra: «Guida», «Dimensione testo», «Lingua».
+- «Salva PDF» salva la scheda con i valori dei cursori.
+
+Righe di comando (anche per il NAS, più avanti)
+-----------------------------------------------
+  python3 diagrammi_hr.py --autotest
+  python3 diagrammi_hr.py --diagnostica
+  python3 diagrammi_hr.py --prepara-mist
+  python3 diagrammi_hr.py --analizza "M 67" [--lingua en] [--riscarica]
+  python3 diagrammi_hr.py --tutti
+
+Compilazione
+------------
+  bash crea_eseguibile_ubuntu.sh
+(usa ~/Claude/Astropy/venv_compila; installa in ~/.local/bin/DiagrammiHR con icona
+nel menu e sulla Scrivania).
+
+Limiti della 1.0 (da sapere)
+----------------------------
+- Estinzione con coefficienti fissi (A_G = 0,789 A_V; E(BP−RP) = 0,413 A_V): per ammassi
+  molto arrossati (A_V > 2) il colore delle stelle rosse è approssimato.
+- Le binarie spostano un po' l'età: nelle prove con ammassi simulati con il 20 % di
+  binarie l'età esce più giovane di circa 0,1-0,15 dex. È compreso nell'incertezza.
+- Gli ammassi molto vicini ed estesi (Iadi) hanno moti propri che cambiano attraverso il
+  cielo: i membri lontani dal centro possono sfuggire.
+- Nei globulari Gaia perde le stelle nel nucleo (troppo affollato): il diagramma viene
+  dalle zone esterne.
+- Senza matplotlib la finestra non parte (serve python3-matplotlib).

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Diagrammi H-R (versione 1.4) – finestra e comandi
+Diagrammi H-R (versione 1.5) – finestra e comandi
 © 2026 Edoardo Battistel
 
 Uso:
@@ -458,7 +458,7 @@ def avvia_finestra():
 
         def _lavoro_riadatta(self, feh):
             self._avviso(self._t("stato_adatta"))
-            res = M.riadatta(self.an, self.griglia, feh, self._avviso)
+            res = M.riadatta(self.an, self.griglia, feh, self._avviso, diretta=True)   # feh della tendina = isocrona
             self.coda.put(("riadattato", res))
 
         def _leggi_coda(self):

@@ -4,8 +4,8 @@ title: "HR Diagrams (Diagrammi H-R): hertzsprung–Russell diagrams of star clus
 authors:
   - family-names: Battistel
     given-names: Edoardo
-version: "1.4"
-date-released: 2026-11-15
+version: "1.5"
+date-released: 2026-11-25
 license: BSD-3-Clause
 repository-code: "https://github.com/EDOKILLER/hr-diagrams"
 keywords:

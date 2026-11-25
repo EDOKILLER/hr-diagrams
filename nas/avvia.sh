@@ -1,5 +1,5 @@
 #!/bin/bash
-# Diagrammi H-R 1.4 - analisi di tutti gli ammassi nel container Docker del NAS
+# Diagrammi H-R 1.5 - analisi di tutti gli ammassi nel container Docker del NAS
 # © 2026 Edoardo Battistel
 # Installa le librerie in /dati/programma/_python (2-5 minuti, serve Internet), analizza tutti
 # gli ammassi a priorità minima, poi cancella librerie e dati temporanei e TERMINA:
@@ -13,7 +13,7 @@ if [ -f /dati/schede/00_summary.pdf ] && [ ! -d /dati/_lavoro ]; then
     echo "Lavoro già finito: le schede sono in /dati/schede. Per rifare tutto cancella schede/00_summary.pdf."
     exit 0
 fi
-if [ ! -f "$VENV/.pronto_1.4" ]; then
+if [ ! -f "$VENV/.pronto_1.5" ]; then
     echo "Installo le librerie (2-5 minuti, serve Internet)…"
     until python -m venv "$VENV" && \
           "$VENV/bin/pip" install --no-cache-dir --upgrade pip && \
@@ -21,7 +21,7 @@ if [ ! -f "$VENV/.pronto_1.4" ]; then
         echo "Installazione non riuscita (Internet assente?): riprovo tra 10 minuti"
         sleep 600
     done
-    touch "$VENV/.pronto_1.4"
+    touch "$VENV/.pronto_1.5"
 fi
 nice -n 19 ionice -c 3 "$VENV/bin/python" servizio_hr.py /dati "$@"
 esito=$?

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Diagrammi H-R – motore di calcolo (versione 1.4)
+Diagrammi H-R – motore di calcolo (versione 1.5)
 © 2026 Edoardo Battistel
 
 Per un ammasso stellare:
@@ -50,7 +50,7 @@ try:
 except Exception:  # pragma: no cover
     HA_MPL = False
 
-VERSIONE = "1.4"
+VERSIONE = "1.5"
 FIRMA = "© 2026 Edoardo Battistel"
 UA = f"DiagrammiHR/{VERSIONE} (Python urllib)"
 
@@ -103,9 +103,9 @@ TESTI = {
         "dra": "Δα cos δ [°]", "ddec": "Δδ [°]", "par_vs_G": "Parallasse e luminosità",
         "risultati": "Risultati", "adattamento": "Adattamento (questo programma)",
         "letteratura": "Letteratura", "non_trovato": "non trovato", "fonte_dati": "Dati",
-        "nota_estinzione": "Estinzione: A_G = 0,789 A_V, E(BP−RP) = 0,413 A_V (Wang & Chen 2019); con MIST esce "
-                           "di solito 0,1–0,2 più alta dei cataloghi. Parallassi corrette di +0,017 mas. "
-                           "Adattamento sulle stelle con M_G < 6.",
+        "nota_estinzione": "Estinzione: A_G = 0,789 A_V, E(BP−RP) = 0,413 A_V (Wang & Chen 2019). Colori delle "
+                           "isocrone spostati di +0,05 in BP−RP (tarati su Pleiadi e M 67). Parallassi corrette di "
+                           "+0,017 mas. Adattamento sulle stelle con M_G < 6.",
         "nota_isocrone": "Isocrone MIST v1.2 (Choi et al. 2016; Dotter 2016), v/v_crit = 0,4, bande Gaia EDR3.",
         "data_analisi": "Analisi del", "stella": "Stella", "clic_stella": "Fai clic su una stella del diagramma "
                                                                          "per vederne i dati Gaia.",
@@ -123,6 +123,10 @@ TESTI = {
                                                     "«sudo apt install python3-matplotlib».",
         "pc": "pc", "anni_luce": "anni luce", "membro_si": "membro", "membro_no": "campo",
         "nota_lett": "Valori di letteratura dallo specchio VizieR di Harvard.",
+        "lett_globulari": "Cantat-Gaudin 2020 e Hunt & Reffert 2023 sono cataloghi di ammassi aperti: per i "
+                          "globulari non danno età affidabili (non mostrate).",
+        "nota_alfa": "Globulari: [M/H] = [Fe/H] + 0,25 per gli elementi α (Salaris et al. 1993); per i più poveri "
+                     "di metalli l'età può restare al limite massimo.",
         "dubbio": "Da verificare", "eta_max": "età al limite massimo (14 miliardi di anni)",
         "eta_min": "età al limite minimo (1 milione di anni)", "av_max": "estinzione al limite massimo",
         "dm_bordo": "distanza al bordo dell'intervallo della parallasse",
@@ -146,9 +150,9 @@ TESTI = {
         "dra": "Δα cos δ [°]", "ddec": "Δδ [°]", "par_vs_G": "Parallax and brightness",
         "risultati": "Results", "adattamento": "Fit (this program)",
         "letteratura": "Literature", "non_trovato": "not found", "fonte_dati": "Data",
-        "nota_estinzione": "Extinction: A_G = 0.789 A_V, E(BP−RP) = 0.413 A_V (Wang & Chen 2019); with MIST it is "
-                           "usually 0.1–0.2 higher than catalogues. Parallaxes corrected by +0.017 mas. "
-                           "Fit uses stars with M_G < 6.",
+        "nota_estinzione": "Extinction: A_G = 0.789 A_V, E(BP−RP) = 0.413 A_V (Wang & Chen 2019). Isochrone colours "
+                           "shifted by +0.05 in BP−RP (calibrated on the Pleiades and M 67). Parallaxes corrected by "
+                           "+0.017 mas. Fit uses stars with M_G < 6.",
         "nota_isocrone": "MIST v1.2 isochrones (Choi et al. 2016; Dotter 2016), v/v_crit = 0.4, Gaia EDR3 bands.",
         "data_analisi": "Analysis of", "stella": "Star", "clic_stella": "Click a star in the diagram "
                                                                        "to see its Gaia data.",
@@ -166,6 +170,10 @@ TESTI = {
                                                   "“sudo apt install python3-matplotlib”.",
         "pc": "pc", "anni_luce": "light years", "membro_si": "member", "membro_no": "field",
         "nota_lett": "Literature values from the Harvard VizieR mirror.",
+        "lett_globulari": "Cantat-Gaudin 2020 and Hunt & Reffert 2023 are open-cluster catalogues: they do not give "
+                          "reliable ages for globular clusters (not shown).",
+        "nota_alfa": "Globular clusters: [M/H] = [Fe/H] + 0.25 for α-enhancement (Salaris et al. 1993); for the most "
+                     "metal-poor ones the age may stay at the upper limit.",
         "dubbio": "To be checked", "eta_max": "age at the upper limit (14 billion years)",
         "eta_min": "age at the lower limit (1 million years)", "av_max": "extinction at the upper limit",
         "dm_bordo": "distance at the edge of the parallax range",
@@ -672,7 +680,7 @@ class GrigliaIsocrone:
         f = self.feh_vicina(feh)
         e = self.eta_vicina(f, eta)
         d = self.dati[(f, e)]
-        return dict(colore=d["BP"] - d["RP"], G=d["G"], massa=d["massa"], fase=d["fase"], feh=f, eta=e)
+        return dict(colore=d["BP"] - d["RP"] + COLORE_OFFSET, G=d["G"], massa=d["massa"], fase=d["fase"], feh=f, eta=e)
 
     # salvataggio compatto
     def salva(self, percorso):
@@ -764,6 +772,14 @@ def scarica_e_prepara_mist(avviso=print, progresso=None):
 
 
 # --------------------------------------------------------------------------- adattamento
+# Correzione del colore delle isocrone MIST v1.2 (bande Gaia EDR3) rispetto alle stelle Gaia DR3:
+# i modelli sono più blu di circa 0,05 in BP−RP. Tarata il 25/11/2026 su Pleiadi e M 67: senza
+# correzione A_V usciva 0,32 e 0,26 (letteratura 0,10–0,18 e 0,07); con +0,05 esce 0,10 e 0,08.
+COLORE_OFFSET = 0.05
+# Globulari: stelle arricchite in elementi α ([α/Fe] ≈ +0,35). Con isocrone a composizione solare
+# scalata si usa la metallicità totale [M/H] = [Fe/H] + log10(0,638·10^[α/Fe] + 0,362) ≈ [Fe/H] + 0,25
+# (Salaris, Chieffi & Straniero 1993).
+CORREZIONE_ALFA_GLOBULARI = 0.25
 ETA_MAX = 10.15    # log età massima cercata: 14,1 miliardi di anni (l'Universo ha 13,8)
 SC_COLORE = 0.04   # mag: incertezza tipica in colore usata per pesare le distanze
 SC_G = 0.12        # mag: in G (la sequenza principale è ripida)
@@ -994,14 +1010,22 @@ def analizza(amm, griglia=None, forza=False, avviso=print, soglia=0.7):
     return an
 
 
-def riadatta(an, griglia, feh, avviso=print):
+def feh_efficace(amm, feh):
+    """[M/H] da usare con le isocrone: per i globulari aggiunge la correzione per gli elementi α."""
+    return feh + (CORREZIONE_ALFA_GLOBULARI if amm.get("tipo") == "globulare" else 0.0)
+
+
+def riadatta(an, griglia, feh, avviso=print, diretta=False):
+    """feh = [Fe/H] dell'ammasso (per i globulari si aggiunge la correzione α);
+    con diretta=True è già la metallicità dell'isocrona (tendina della finestra)."""
     dp = an.get("dist_plx") or {}
     c, G, w = stelle_per_adattamento(an["dati"], an["p"], an["soglia"], an["ammasso"].get("tipo", "aperto"),
                                      dp.get("dm"))
     av_max = 3.0 if an["ammasso"].get("tipo") == "aperto" else 2.0
-    res = adatta_isocrone(c, G, w, griglia, feh, an.get("dist_plx"), an["ammasso"].get("tipo"), avviso, av_max)
+    res = adatta_isocrone(c, G, w, griglia, feh if diretta else feh_efficace(an["ammasso"], feh), an.get("dist_plx"), an["ammasso"].get("tipo"), avviso, av_max)
     avviso(f"  log età {res['log_eta']:.2f} ± {res['err_log_eta']:.2f}, m−M {res['dm']:.2f} ± {res['err_dm']:.2f}, "
            f"A_V {res['av']:.2f} ± {res['err_av']:.2f}, [Fe/H] {res['feh']:+.2f}")
+    res["tipo"] = an["ammasso"].get("tipo", "aperto")
     return res
 
 
@@ -1053,7 +1077,10 @@ def righe_risultati(an, lingua, valori=None):
         r.append((T(lingua, "distanza"), testo_d))
         r.append((T(lingua, "dm"), f"{num(v['dm'], 2, lingua)} ± {num(v.get('err_dm'), 2, lingua)}"))
         r.append((T(lingua, "av"), f"{num(v['av'], 2, lingua)} ± {num(v.get('err_av'), 2, lingua)}"))
-        r.append((T(lingua, "metallicita"), f"{v['feh']:+.2f}".replace(".", "," if lingua == "it" else ".")))
+        etichetta_feh = T(lingua, "metallicita")
+        if an.get("ammasso", {}).get("tipo") == "globulare":
+            etichetta_feh = etichetta_feh.replace("[Fe/H]", "[M/H] (α)")
+        r.append((etichetta_feh, f"{v['feh']:+.2f}".replace(".", "," if lingua == "it" else ".")))
         if v.get("dubbi"):
             r.append(("⚠ " + T(lingua, "dubbio"), "; ".join(T(lingua, d) for d in v["dubbi"])))
     m = an.get("membri") or {}
@@ -1068,6 +1095,8 @@ def righe_risultati(an, lingua, valori=None):
 
 def righe_letteratura(an, lingua):
     r = []
+    if an["ammasso"].get("tipo") == "globulare":
+        return [(T(lingua, "letteratura"), T(lingua, "lett_globulari"))]
     for sigla, nome in (("CG20", "Cantat-Gaudin et al. 2020"), ("HR23", "Hunt & Reffert 2023")):
         v = (an.get("lett") or {}).get(sigla)
         if not v or v.get("log_eta") is None:
@@ -1174,7 +1203,7 @@ def testo_riquadro(v, lingua):
         feh = feh.replace(".", ",")
     return "\n".join([f"{T(lingua, 'eta')}: {testo_eta(v['log_eta'], lingua)}",
                       f"{T(lingua, 'distanza')}: {intero(10 ** (v['dm'] / 5 + 1), lingua)} pc",
-                      f"A_V: {num(v['av'], 2, lingua)}", f"[Fe/H]: {feh}"])
+                      f"A_V: {num(v['av'], 2, lingua)}", f"{'[M/H]' if v.get('tipo') == 'globulare' else '[Fe/H]'}: {feh}"])
 
 
 def aggiorna_isocrona(linea, riquadro, griglia, v, lingua):
@@ -1290,7 +1319,10 @@ def _pagina_testo(ax, an, lingua, valori):
         riga(f"   {b}", 10, passo=0.006)
     y -= 0.02
     riga(f"{T(lingua, 'fonte_dati')}: {an.get('fonte', '')} · {an['membri']['metodo']}", 8.5, colore="#a9b3cc")
-    for nota in (T(lingua, "nota_isocrone"), T(lingua, "nota_estinzione"), T(lingua, "nota_colori"), T(lingua, "nota_lett")):
+    note = [T(lingua, "nota_isocrone"), T(lingua, "nota_estinzione"), T(lingua, "nota_colori"), T(lingua, "nota_lett")]
+    if amm.get("tipo") == "globulare":
+        note.insert(1, T(lingua, "nota_alfa"))
+    for nota in note:
         riga(nota, 8.5, colore="#a9b3cc")
     riga(f"{T(lingua, 'data_analisi')} {an['data']} · H-R Diagrams {VERSIONE}", 8.5, colore="#a9b3cc")
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # =============================================================================
-# Diagrammi H-R 1.4 – crea l'eseguibile per Ubuntu e lo installa (menu + Scrivania)
+# Diagrammi H-R 1.5 – crea l'eseguibile per Ubuntu e lo installa (menu + Scrivania)
 # © 2026 Edoardo Battistel
 #
-# Uso:  cd ~/Claude/Astropy/programma_diagrammi_hr/versione_1.4
+# Uso:  cd ~/Claude/Astropy/programma_diagrammi_hr/versione_1.5
 #       bash crea_eseguibile_ubuntu.sh
 # Usa il venv ~/Claude/Astropy/venv_compila (PyInstaller), che vede numpy, scipy,
 # matplotlib, scikit-learn e Pillow di sistema (python3-matplotlib, python3-sklearn).

@@ -15,11 +15,11 @@ Builds the colour–magnitude diagram of open and globular clusters from Gaia DR
 
 ## Tested on real data
 
-Open clusters (1.3 run) compared with Cantat-Gaudin+2020: offset −0.05 dex in log age, scatter 0.19, 74 % within 0.3 dex. Globular clusters were wrong in 1.3 (crowding) and are what 1.4 fixes.
+Open clusters (1.3 run) compared with Cantat-Gaudin+2020: offset −0.05 dex in log age, scatter 0.19, 74 % within 0.3 dex. Globular clusters: 1.4 removed the crowding problem of 1.3; 1.5 adds a +0.05 colour offset to the MIST isochrones (calibrated on the Pleiades and M 67) and the Salaris et al. (1993) alpha-enhancement correction. With 1.5, M 13 gives 12.6 Gyr at 7.9 kpc (literature ~11.5–13 Gyr); the most metal-poor globulars (M 92, NGC 6397) still reach the 14.1 Gyr limit and are flagged "To be checked" (alpha-enhanced isochrones would be needed). Open clusters with 1.5: Pleiades 135 pc, A_V 0.10; M 67 3.98 Gyr, 851 pc, A_V 0.08.
 
 > **Language note.** The interface is in **Italian** (large, adjustable text); plots, PDF/PNG cards and scientific output are in **English**. Code comments are in Italian. The original Italian guide is [`LEGGIMI.txt`](LEGGIMI.txt).
 
-**Version:** 1.4 (2026-11-15). **Status:** **Beta**: 1.4 not yet built; the globular-cluster fix still has to be tested.
+**Version:** 1.5 (2026-11-25). **Status:** **Beta**: 1.5 built and self-tested on the PC; full NAS run of 939 clusters in progress.
 
 ## Quick start
 

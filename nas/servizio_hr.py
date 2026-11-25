@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Diagrammi H-R 1.4 – versione per il NAS (Docker): analizza TUTTI gli ammassi e si ferma.
+Diagrammi H-R 1.5 – versione per il NAS (Docker): analizza TUTTI gli ammassi e si ferma.
 © 2026 Edoardo Battistel
 
 Uso (dentro il container):  python servizio_hr.py /dati
@@ -175,7 +175,8 @@ def scrivi_riepilogo(percorso, stato, lingua=LINGUA):
                  f"Date: {time.strftime('%Y-%m-%d %H:%M')}   ·   H-R Diagrams {M.VERSIONE} (NAS)   ·   {M.FIRMA}\n\n"
                  "Not analysed: " + "; ".join(f"{k} {v}" for k, v in sorted(motivi.items(), key=lambda x: -x[1])) +
                  "\n\nEach analysed cluster has its own PDF sheet in this folder (CMD, members, comparison with the literature).\n"
-                 "CG20 / HR23 = log age from Cantat-Gaudin et al. 2020 / Hunt & Reffert 2023.\n"
+                 "CG20 / HR23 = log age from Cantat-Gaudin et al. 2020 / Hunt & Reffert 2023 (open clusters only).\n"
+                 "Globular clusters: [M/H] = [Fe/H] + 0.25 for α-enhancement; the most metal-poor ones may stay at the age limit.\n"
                  "Notes: «age at limit» = best age at the edge of the searched range (6.0 or 10.15 in log age);\n"
                  "«A_V at limit» = extinction at the maximum searched; «distance at edge» = at the edge of the parallax range.\n"
                  "These results should be checked by eye on the cluster sheet.\n\n" +
@@ -315,8 +316,10 @@ def main():
             an["adattamento"] = M.riadatta(an, griglia, amm.get("feh", 0.0), lambda s: None)
             pdf = schede / f"{amm['chiave']}.pdf"
             M.salva_pdf(pdf, an, LINGUA, griglia)
+            aperto = amm.get("tipo") != "globulare"   # CG20 e HR23 sono cataloghi di ammassi aperti
             voce.update(esito="ok", pdf=pdf.name, valori=an["adattamento"],
-                        cg20=((lett.get("CG20") or {}).get("log_eta")), hr23=((lett.get("HR23") or {}).get("log_eta")))
+                        cg20=((lett.get("CG20") or {}).get("log_eta")) if aperto else None,
+                        hr23=((lett.get("HR23") or {}).get("log_eta")) if aperto else None)
             r = an["adattamento"]
             registro(f"[{etichetta}] {nome}: {voce['membri']} membri, log età {r['log_eta']:.2f}, "
                      f"{r['dist_pc']:.0f} pc, A_V {r['av']:.2f}{'  DA VERIFICARE ' + ','.join(r['dubbi']) if r.get('dubbi') else ''}"

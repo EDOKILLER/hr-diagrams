@@ -1,6 +1,19 @@
-DIAGRAMMI H-R – versione 1.4 (15 novembre 2026)
+DIAGRAMMI H-R – versione 1.5 (25 novembre 2026)
 © 2026 Edoardo Battistel
 =====================================================================
+
+Novità della 1.5
+----------------
+- Colori delle isocrone MIST corretti di +0,05 in BP−RP: i modelli erano un po' più blu delle stelle
+  Gaia. Tarato su Pleiadi e M 67: l'estinzione ora torna come in letteratura (Pleiadi A_V 0,10,
+  M 67 0,08; prima 0,32 e 0,26) e l'età di M 67 diventa 4,0 miliardi di anni (letteratura 4,3).
+- Globulari: metallicità corretta per gli elementi α ([M/H] = [Fe/H] + 0,25, Salaris et al. 1993).
+  M 13 ora esce 12,6 miliardi di anni (prima al tetto di 14,1). I più poveri di metalli (M 92,
+  NGC 6397) restano al tetto e sono segnati «To be checked»: servirebbero isocrone MIST 2.5 con
+  elementi α (idea per una versione futura).
+- Globulari: niente confronto con Cantat-Gaudin e Hunt & Reffert (cataloghi di ammassi aperti,
+  per i globulari davano età senza senso, es. 931 milioni di anni per M 13).
+- Nella finestra «Riadatta» usa la metallicità della tendina così com'è (già quella dell'isocrona).
 
 Novità della 1.4
 ----------------
